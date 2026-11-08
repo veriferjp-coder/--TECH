@@ -20,3 +20,7 @@ TIMEZONE=Africa/Lagos
 # AI CONFIGURATION
 GROQ_API_KEY=
 AI_MODEL=llama-3.3-70b-versatile
+QR_ENABLED: false,
+MULTI_DEVICE: true,
+MULTI_SESSION: true,
+AUTO_RECONNECT: true
