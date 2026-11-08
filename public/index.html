@@ -1,0 +1,271 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIMON TECH BOT | Pair Device</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background: #080d18;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+  background: #111a2b;
+  border: 1px solid #263957;
+  border-radius: 20px;
+  padding: 30px 23px;
+  text-align: center;
+  box-shadow: 0 15px 50px #0008;
+}
+
+.logo {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #00d9a0;
+  margin-bottom: 15px;
+}
+
+h1 {
+  font-size: 25px;
+  color: #00e6a8;
+}
+
+.subtitle {
+  color: #aab7c9;
+  font-size: 13px;
+  margin: 12px 0 25px;
+  line-height: 1.6;
+}
+
+.status {
+  display: inline-block;
+  background: #123c35;
+  color: #40ffc5;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  margin-bottom: 23px;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin-bottom: 9px;
+  font-size: 13px;
+}
+
+input {
+  width: 100%;
+  padding: 15px;
+  background: #080f1c;
+  border: 1px solid #34445d;
+  border-radius: 10px;
+  outline: none;
+  color: white;
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+input:focus {
+  border-color: #00e6a8;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  background: #00d9a0;
+  border: none;
+  border-radius: 10px;
+  color: #06130f;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+#result {
+  display: none;
+  margin-top: 20px;
+  background: #081b1b;
+  border: 1px solid #00a77c;
+  padding: 18px;
+  border-radius: 12px;
+}
+
+#code {
+  font-size: 27px;
+  letter-spacing: 5px;
+  color: #00ffc3;
+  margin: 15px 0;
+  font-weight: bold;
+}
+
+.copy {
+  background: #1c3850;
+  color: white;
+  margin-top: 10px;
+}
+
+.message {
+  font-size: 13px;
+  color: #b9c8d8;
+  margin-top: 12px;
+  line-height: 1.6;
+}
+
+footer {
+  margin-top: 25px;
+  color: #71829a;
+  font-size: 11px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <img
+    class="logo"
+    src="https://files.catbox.moe/msvhxd.png"
+    alt="SIMON TECH BOT"
+  >
+
+  <h1>SIMON TECH BOT</h1>
+
+  <p class="subtitle">
+    Powerful Multi-Device WhatsApp Bot
+    <br>
+    Connect your WhatsApp using a secure pairing code.
+  </p>
+
+  <div class="status">● PAIRING SYSTEM ONLINE</div>
+
+  <form id="pairForm">
+
+    <label>WhatsApp Number</label>
+
+    <input
+      type="tel"
+      id="number"
+      placeholder="234XXXXXXXXXX"
+      required
+      minlength="10"
+      maxlength="15"
+    >
+
+    <button type="submit" id="pairBtn">
+      GENERATE PAIRING CODE
+    </button>
+
+  </form>
+
+  <div id="result">
+    <p>YOUR PAIRING CODE</p>
+    <div id="code">--------</div>
+
+    <button class="copy" onclick="copyCode()">
+      COPY CODE
+    </button>
+
+    <p class="message">
+      Open WhatsApp → Linked Devices
+      → Link a Device → Link with phone number.
+    </p>
+  </div>
+
+  <p id="message" class="message"></p>
+
+  <footer>
+    POWERED BY SIMON TECH
+    <br><br>
+    © 2026 SIMON TECH BOT
+  </footer>
+
+</div>
+
+<script>
+const form = document.getElementById('pairForm');
+const btn = document.getElementById('pairBtn');
+const result = document.getElementById('result');
+const message = document.getElementById('message');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const number = document.getElementById('number').value
+    .replace(/\D/g, '');
+
+  if (!/^\d{10,15}$/.test(number)) {
+    message.textContent = 'Enter a valid international number.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'GENERATING CODE...';
+  result.style.display = 'none';
+  message.textContent = '';
+
+  try {
+    const response = await fetch(
+      `/pair?number=${encodeURIComponent(number)}`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || 'Pairing failed.');
+    }
+
+    if (!data.code) {
+      message.textContent = data.message;
+      return;
+    }
+
+    document.getElementById('code').textContent = data.code;
+    result.style.display = 'block';
+
+  } catch (error) {
+    message.textContent = error.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'GENERATE PAIRING CODE';
+  }
+});
+
+function copyCode() {
+  const code = document.getElementById('code').textContent;
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code);
+    message.textContent = 'Pairing code copied.';
+  }
+}
+</script>
+
+</body>
+  </html>
+    
